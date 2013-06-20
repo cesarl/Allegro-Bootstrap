@@ -4,13 +4,11 @@ CC		=	g++
 
 RM		=	rm -f
 
-CPPFLAGS	=	-W -Wextra -Wall -Werror
-
-CPPFLAGS	+=	-I. -I../src/debug -I../src/manager -I../src/utilities
+CPPFLAGS	=	-W -Wextra -Wall -Werror -MMD
 
 LDFLAGS		=	-L/usr/lib -lallegro -lallegro_dialog -lallegro_primitives -lallegro_ttf -lallegro_font -lallegro_image
 
-INC		=	-I. -I/usr/include/allegro5
+CPPFLAGS	+=	-I. -I/usr/include/allegro5 -I../src/debug -I../src/manager -I../src/utilities
 
 SRCS		=	../src/debug/ILogger.cpp \
 			../src/debug/Exception.cpp \
@@ -20,27 +18,19 @@ SRCS		=	../src/debug/ILogger.cpp \
 
 OBJS		=	$(SRCS:.cpp=.o)
 
+DEPS		=	$(SRCS:.cpp=.d)
+
 ECHO		=	echo -e
-
-SUFFIXES	+=	.d
-
-DEPFILES	:=	$(patsubst %.cpp, %.d, $(SRCS))
-
-ifeq		(0, $(words $(findstring $(MAKECMDGOALS), )))
-		-include $(DEPFILES)
-endif
-
-%.d : %.cpp
-		$(CC) $(CPPFLAGS) -MM -MT '$(patsubst %.cpp,%.o,$<)' $< -MF $@
 
 all		:	$(NAME)
 
 $(NAME)		:	$(OBJS)
-			@$(CC) $(OBJS) -o $(NAME) $(INC) $(LDFLAGS)
+			# @$(CC) $(SRCS) -MMD $(LDFLAGS) $(CPPFLAGS)
+			@$(CC) $(OBJS) -o $(NAME) $(LDFLAGS) $(CPPFLAGS)
 			@$(ECHO) '\033[1;37;44m> Compiled {\033[4m$(NAME)}\033[0m'
 
 clean		:
-			@$(RM) $(OBJS)
+			@$(RM) $(OBJS) $(DEPS)
 			@$(ECHO) '\033[1;37;41m> Directory cleaned\033[0m'
 
 fclean		:	clean
@@ -50,3 +40,5 @@ fclean		:	clean
 re		:	fclean all
 
 .PHONY		:	all clean re
+
+-include $(DEPS)
