@@ -6,19 +6,6 @@
 #include				<exception>
 #include				<allegro5/allegro_image.h>
 
-struct Test
-{
-  int t;
-  int j;
-};
-
-
-void					lolilol()
-{
-  ImagePtr img = ResourceManager::getInstance().get<Image>("stars.png");
-  std::cout << "counter : " << img->getCounter() << std::endl;
-}
-
 int					main()
 {
 
@@ -36,43 +23,38 @@ int					main()
   // main //
   //////////
 
-  std::cout << "coucou" << std::endl;
-  Test *test = new Test;
-  std::cout << "coucou" << std::endl;
-  delete test;
-
-  char *foo = new char[31];
-  (void)foo;
-  delete foo;
-
   /////////////////////////
   // media manager tests //
   /////////////////////////
+
   try
     {
       MediaManager::getInstance().registerLoader(new ImageLoader, ".jpg,.png,.jpeg");
+
       MediaManager::getInstance().addSearchPath("./assets/imgs/");
 
-      MediaManager::getInstance().load<Image>("stars.png");
+      // MediaManager::getInstance().load<Image>("stars.png");
+
+      {
+	ImagePtr img = ResourceManager::getInstance().get<Image>("stars.png");
+	ImagePtr img1 = ResourceManager::getInstance().get<Image>("stars.png");
+	ImagePtr img2 = ResourceManager::getInstance().get<Image>("stars.png");
+	ImagePtr img3 = ResourceManager::getInstance().get<Image>("stars.png");
+	ILogger::log("Il y a %i instances de la meme image stars.png", img->getCounter());
+	img->draw();
+      }
 
       ImagePtr img = ResourceManager::getInstance().get<Image>("stars.png");
-      ImagePtr img1 = ResourceManager::getInstance().get<Image>("stars.png");
-      ImagePtr img2 = ResourceManager::getInstance().get<Image>("stars.png");
-      ImagePtr img3 = ResourceManager::getInstance().get<Image>("stars.png");
 
-      std::cout << "counter : " << img1->getCounter() << std::endl;
-      // delete img1;
+      ILogger::log("Il y a %i instances de la meme image stars.png", img->getCounter());
 
-      img->draw();
-      ILogger::log("Foo");
-      ILogger::log("%d lapins dancent en %s", 5, "ronde");
+      ResourceManager::getInstance().reload();
+
       al_flip_display();
     }
   catch (const std::exception &e)
     {
       ILogger::log(e.what());
     }
-
-  lolilol();
   return 0;
 }

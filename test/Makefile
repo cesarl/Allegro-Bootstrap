@@ -13,13 +13,13 @@ LDFLAGS		=	-L/usr/lib -lallegro -lallegro_dialog -lallegro_primitives -lallegro_
 INC		=	-I. -I/usr/include/allegro5
 
 SRCS		=	../src/debug/ILogger.cpp \
-			../src/debug/MemoryManager.cpp \
 			../src/debug/Exception.cpp \
 			../src/manager/Resource.cpp \
 			main.cpp
 
 
 OBJS		=	$(SRCS:.cpp=.o)
+##			$(SRCS:.cpp=.p)
 
 ECHO		=	echo -e
 
@@ -38,5 +38,10 @@ fclean		:	clean
 			@$(ECHO) '\033[1;37;41m> Remove executable\033[0m'
 
 re		:	fclean all
+
+%.p		:	%.cpp
+			%(MAKEDEPEND)
+##			@sed 's/\($*\)\.o[ :]*/\1.o $@ : /g' < $*.d > $@; \
+##			rm -f $*.d; [ -s $@ ] || rm -f $@
 
 .PHONY		:	all clean re

@@ -30,6 +30,11 @@ void					ILogger::log(const char* format, ...)
   currentLogger_->write(buf);
 }
 
+void					ILogger::log(const std::string & s)
+{
+  currentLogger_->write(s);
+}
+
 ILogger					&ILogger::log()
 {
   return *(currentLogger_);

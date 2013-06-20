@@ -16,6 +16,8 @@ public:
   static void				setLogger(ILogger *logger);
   static void				log(const char *format, ...);
   static ILogger			&log();
+  static void				log(const std::string & s);
+
   template				<class T>
   ILogger				&operator<<(const T &toLog);
 private:

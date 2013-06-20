@@ -22,28 +22,4 @@ protected:
   {}
 };
 
-// class					ImageLoader : public Loader<ALLEGRO_BITMAP>
-// {
-// public:
-//   virtual				~ImageLoader()
-//   {}
-
-//   virtual ALLEGRO_BITMAP		*load(const std::string &name)
-//   {
-//     ALLEGRO_BITMAP			*bmp;
-
-//     bmp = al_load_bitmap(name.c_str());
-//     if (!bmp)
-//       throw LoadingFailed(name, "ImageLoader failed to load image.");
-//     return bmp;
-//   }
-//   virtual void				save(const ALLEGRO_BITMAP *, const std::string &name)
-//   {
-//     throw LoadingFailed(name, "ImageLoader doesn't support SAVE.");
-//   }
-// protected:
-//   ImageLoader()
-//   {}
-// };
-
 #endif					// __LOADER_HPP__

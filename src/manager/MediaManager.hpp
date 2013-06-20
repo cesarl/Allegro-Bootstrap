@@ -39,7 +39,6 @@ public:
     File				path;
 
     path = this->findMedia(file);
-    path.getFileName();
     this->findLoader<T>(path).load(path.getFullName());
   }
 
@@ -53,6 +52,23 @@ public:
       {
 	this->paths_.insert(path + "\\");
       }
+  }
+
+  void					addSearchPath(const std::vector<std::string> & list)
+  {
+    std::vector<std::string>::const_iterator it;
+
+    it = list.begin();
+    while (it != list.end())
+      {
+	this->addSearchPath(*it);
+	++it;
+      }
+  }
+
+  void					ClearSearchPath()
+  {
+    this->paths_.clear();
   }
 
   template				<class T>

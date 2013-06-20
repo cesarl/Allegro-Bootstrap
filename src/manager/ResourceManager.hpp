@@ -22,9 +22,8 @@ public:
 	it->second->addRef();
 	return static_cast<T*>(it->second);
       }
-    std::cout << this->list_.size() << std::endl;
     MediaManager::getInstance().load<T>(name);
-    return this->get<T>(name);
+    return this->find<T>(name);
   }
 
   void					add(const std::string &name, Resource *resource)
@@ -51,6 +50,19 @@ public:
       }
     this->list_.erase(it);
   }
+
+  void					reload()
+  {
+    t_iter				it;
+
+    it = this->list_.begin();
+    while (it != this->list_.end())
+      {
+	ILogger::log(it->first);
+	// delete *(it->second);
+	++it;
+      }
+  }
 private:
   ResourceManager()
   {}
@@ -62,9 +74,24 @@ private:
     it = this->list_.begin();
     while (it != this->list_.end())
       {
+	ILogger::log("%s : has not been destroyed before exit the program.");
 	delete it->second;
 	++it;
       }
+  }
+
+  template				<class T>
+  inline T				*find(const std::string &name) const
+  {
+    t_const_iter			it;
+
+    it = this->list_.find(name);
+    if (it != this->list_.end())
+      {
+	return static_cast<T*>(it->second);
+      }
+    throw LoadingFailed(name, "This file is not loaded and can not be found.");
+    return NULL;
   }
 
 private:
