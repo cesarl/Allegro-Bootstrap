@@ -19,9 +19,19 @@ SRCS		=	../src/debug/ILogger.cpp \
 
 
 OBJS		=	$(SRCS:.cpp=.o)
-##			$(SRCS:.cpp=.p)
 
 ECHO		=	echo -e
+
+SUFFIXES	+=	.d
+
+DEPFILES	:=	$(patsubst %.cpp, %.d, $(SRCS))
+
+ifeq		(0, $(words $(findstring $(MAKECMDGOALS), )))
+		-include $(DEPFILES)
+endif
+
+%.d : %.cpp
+		$(CC) $(CPPFLAGS) -MM -MT '$(patsubst %.cpp,%.o,$<)' $< -MF $@
 
 all		:	$(NAME)
 
@@ -38,10 +48,5 @@ fclean		:	clean
 			@$(ECHO) '\033[1;37;41m> Remove executable\033[0m'
 
 re		:	fclean all
-
-%.p		:	%.cpp
-			%(MAKEDEPEND)
-##			@sed 's/\($*\)\.o[ :]*/\1.o $@ : /g' < $*.d > $@; \
-##			rm -f $*.d; [ -s $@ ] || rm -f $@
 
 .PHONY		:	all clean re
