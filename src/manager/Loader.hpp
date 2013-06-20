@@ -9,9 +9,10 @@ class					Loader
 {
 public:
   virtual				~Loader() {};
-  virtual T				*load(const File &file)
+  virtual T				*load(const File &file, bool force = false)
   {
     throw LoadingFailed(file.getFullName(), "This loader doesn't support LOAD for this file type.");
+    (void)force;
   }
   virtual void				save(const T *, const std::string &name)
   {

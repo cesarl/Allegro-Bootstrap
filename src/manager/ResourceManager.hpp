@@ -26,13 +26,19 @@ public:
     return this->find<T>(name);
   }
 
-  void					add(const std::string &name, Resource *resource)
+  void					add(const std::string &name, Resource *resource, bool force = false)
   {
     Assert(resource != NULL);
-
     if (this->list_.find(name) != this->list_.end())
       {
-	ILogger::log("%s : already loaded", name.c_str());
+	if (force)
+	  {
+	    *(this->list_[name]) = *resource;
+	  }
+	else
+	  {
+	    ILogger::log("%s : already loaded", name.c_str());
+	  }
       }
     this->list_[name] = resource;
     resource->name_ = name;
@@ -51,6 +57,7 @@ public:
     this->list_.erase(it);
   }
 
+  template				<class T>
   void					reload()
   {
     t_iter				it;
@@ -58,8 +65,10 @@ public:
     it = this->list_.begin();
     while (it != this->list_.end())
       {
-	ILogger::log(it->first);
-	// delete *(it->second);
+	if (dynamic_cast<T*>(it->second))
+	  {
+	    MediaManager::getInstance().load<T>(it->first, true);
+	  }
 	++it;
       }
   }

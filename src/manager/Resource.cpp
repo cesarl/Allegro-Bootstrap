@@ -1,11 +1,11 @@
 #include				"Resource.hh"
 #include				"ResourceManager.hpp"
 
-Resource::Resource(const std::string & name) :
+Resource::Resource(const std::string & name, bool force) :
   name_(name),
   counter_(1)
 {
-  ResourceManager::getInstance().add(name, this);
+  ResourceManager::getInstance().add(name, this, force);
 }
 
 Resource::~Resource()
@@ -27,9 +27,14 @@ int					Resource::release()
 {
   int					c = --(this->counter_);
 
-  if (c == 0)
+  if (c <= 0)
     delete this;
   return c;
+}
+
+void					Resource::operator=(Resource &o)
+{
+  this->counter_ = o.counter_;
 }
 
 int					Resource::getCounter() const

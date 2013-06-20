@@ -34,12 +34,12 @@ class					MediaManager :
 
 public:
   template				<class T>
-  void					load(const File &file) const
+  void					load(const File &file, bool force = false) const
   {
     File				path;
 
     path = this->findMedia(file);
-    this->findLoader<T>(path).load(path.getFullName());
+    this->findLoader<T>(path).load(path.getFullName(), force);
   }
 
   void					addSearchPath(const std::string &path)
@@ -66,7 +66,7 @@ public:
       }
   }
 
-  void					ClearSearchPath()
+  void					clearSearchPath()
   {
     this->paths_.clear();
   }
