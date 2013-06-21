@@ -18,7 +18,7 @@ void					draw(float time, const ALLEGRO_EVENT &ev)
 
   camera.update(time, ev);
   img2->draw3d();
-  img->draw();
+  // img->draw();
   (void)ev;
   (void)time;
 }

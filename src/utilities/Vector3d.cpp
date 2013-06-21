@@ -2,23 +2,23 @@
 #include				"Vector3d.hh"
 
 Vector3d::Vector3d()
-  : _x(0)
-  , _y(0)
-  , _z(0)
+  : x(0)
+  , y(0)
+  , z(0)
 {
 }
 
 Vector3d::Vector3d(const Vector3d& other)
-  : _x(other._x)
-  , _y(other._y)
-  , _z(other._z)
+  : x(other.x)
+  , y(other.y)
+  , z(other.z)
 {
 }
 
 Vector3d::Vector3d(double x, double y, double z)
-  : _x(x)
-  , _y(y)
-  , _z(z)
+  : x(x)
+  , y(y)
+  , z(z)
 {
 }
 
@@ -28,74 +28,74 @@ Vector3d::~Vector3d()
 
 Vector3d				&Vector3d::operator+=(const Vector3d& other)
 {
-  this->_x += other._x;
-  this->_y += other._y;
-  this->_z += other._z;
+  this->x += other.x;
+  this->y += other.y;
+  this->z += other.z;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator-=(const Vector3d& other)
 {
-  this->_x -= other._x;
-  this->_y -= other._y;
-  this->_z -= other._z;
+  this->x -= other.x;
+  this->y -= other.y;
+  this->z -= other.z;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator*=(const Vector3d& other)
 {
-  this->_x *= other._x;
-  this->_y *= other._y;
-  this->_z *= other._z;
+  this->x *= other.x;
+  this->y *= other.y;
+  this->z *= other.z;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator/=(const Vector3d& other)
 
 {
-  this->_x /= other._x;
-  this->_y /= other._y;
-  this->_z /= other._z;
+  this->x /= other.x;
+  this->y /= other.y;
+  this->z /= other.z;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator=(float value)
 {
-  this->_x = value;
-  this->_y = value;
-  this->_z = value;
+  this->x = value;
+  this->y = value;
+  this->z = value;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator+=(float value)
 {
-  this->_x += value;
-  this->_y += value;
-  this->_z += value;
+  this->x += value;
+  this->y += value;
+  this->z += value;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator-=(float value)
 {
-  this->_x -= value;
-  this->_y -= value;
-  this->_z -= value;
+  this->x -= value;
+  this->y -= value;
+  this->z -= value;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator*=(float value)
 {
-  this->_x *= value;
-  this->_y *= value;
-  this->_z *= value;
+  this->x *= value;
+  this->y *= value;
+  this->z *= value;
   return (*this);
 }
 
 Vector3d				&Vector3d::operator/=(float value)
 {
-  this->_x /= value;
-  this->_y /= value;
-  this->_z /= value;
+  this->x /= value;
+  this->y /= value;
+  this->z /= value;
   return (*this);
 }
 
@@ -134,9 +134,9 @@ Vector3d				operator/(const Vector3d& left, const Vector3d& right)
 bool					Vector3d::operator==(const Vector3d& other) const
 {
   return (
-	  (((other._x - 0.0001f) < this->_x) && (this->_x < (other._x + 0.0001f))) &&
-	  (((other._y - 0.0001f) < this->_y) && (this->_y < (other._y + 0.0001f))) &&
-	  (((other._z - 0.0001f) < this->_z) && (this->_z < (other._z + 0.0001f))) );
+	  (((other.x - 0.0001f) < this->x) && (this->x < (other.x + 0.0001f))) &&
+	  (((other.y - 0.0001f) < this->y) && (this->y < (other.y + 0.0001f))) &&
+	  (((other.z - 0.0001f) < this->z) && (this->z < (other.z + 0.0001f))) );
 }
 
 bool					Vector3d::operator!=(const Vector3d& other) const
@@ -146,33 +146,33 @@ bool					Vector3d::operator!=(const Vector3d& other) const
 
 Vector3d				&Vector3d::operator=(const Vector3d& other)
 {
-  this->_x = other._x;
-  this->_y = other._y;
-  this->_z = other._z;
+  this->x = other.x;
+  this->y = other.y;
+  this->z = other.z;
   return *this;
 }
 
 double					Vector3d::distance(const Vector3d& other)
 {
-  return sqrt((other._x - this->_x) * (other._x - this->_x)
-	      + (other._y - this->_y) * (other._y - this->_y));
+  return sqrt((other.x - this->x) * (other.x - this->x)
+	      + (other.y - this->y) * (other.y - this->y));
 }
 double					Vector3d::length()
 {
-  return sqrt(this->_x * this->_x + this->_y * this->_y + this->_z * this->_z);
+  return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 }
 
 double					Vector3d::dotProduct(const Vector3d& other)
 {
-  return (this->_x * other._x + this->_y * other._y + this->_z * other._z);
+  return (this->x * other.x + this->y * other.y + this->z * other.z);
 
 }
 
 Vector3d				Vector3d::crossProduct(const Vector3d& other)
 {
-  double nx = (this->_y * other._z) - (this->_z * other._y);
-  double ny = (this->_z * other._x) - (this->_x * other._z);
-  double nz = (this->_x * other._y) - (this->_y * other._x);
+  double nx = (this->y * other.z) - (this->z * other.y);
+  double ny = (this->z * other.x) - (this->x * other.z);
+  double nz = (this->x * other.y) - (this->y * other.x);
 
   return Vector3d(nx, ny, nz);
 }
@@ -184,16 +184,16 @@ Vector3d				Vector3d::normal()
     length = 0;
   else
     length = 1 / this->length();
-  double nx = this->_x * length;
-  double ny = this->_y * length;
-  double nz = this->_z * length;
+  double nx = this->x * length;
+  double ny = this->y * length;
+  double nz = this->z * length;
   return Vector3d(nx, ny, nz);
 }
 
 double					Vector3d::angle(const Vector3d& other)
 {
-  double dx = this->_x - other._x;
-  double dy = this->_y - other._y;
+  double dx = this->x - other.x;
+  double dy = this->y - other.y;
 
   return (atan2(dy, dx) / M_PI * 180.0f);
 }

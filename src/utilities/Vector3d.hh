@@ -3,21 +3,21 @@
 
 class		Vector3d
 {
-private:
-  double	_x;
-  double	_y;
-  double	_z;
+public:
+  double	x;
+  double	y;
+  double	z;
 public:
   Vector3d();
   Vector3d(const Vector3d& other);
   Vector3d(double x, double y, double z);
   ~Vector3d();
-  double	getX() const { return this->_x; }
-  void		setX(double v) { this->_x = v; }
-  double	getY() const { return this->_y; }
-  void		setY(double v) { this->_y = v; }
-  double	getZ() const { return this->_z; }
-  void		setZ(double v) { this->_z = v; }
+  double	getX() const { return this->x; }
+  void		setX(double v) { this->x = v; }
+  double	getY() const { return this->y; }
+  void		setY(double v) { this->y = v; }
+  double	getZ() const { return this->z; }
+  void		setZ(double v) { this->z = v; }
   Vector3d	&operator=(float value);
   Vector3d	&operator+=(float value);
   Vector3d	&operator-=(float value);

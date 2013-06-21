@@ -43,6 +43,7 @@ public:
     glTranslatef(0.0, 0.0, 0.0);
     glBegin(GL_QUADS);
 
+    glColor3f(1.0f,1.0f,1.0f);
     glTexCoord2f(0.0, 0.0); // Top left hand corner
     glVertex3f(0.0, 0.0, 0.0); // X,Y,Z
     glTexCoord2f(1.0, 0.0); // Bottom left hand corner
@@ -53,6 +54,28 @@ public:
     glVertex3f(0, 100.0, 0.0); // X,Y,Z
 
     glEnd();
+
+    glScalef(20.0f, 20.0f, 20.0f);
+
+    glBegin(GL_TRIANGLES);
+    //Triangle 1
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
+    //Triangle 2
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f( 1.0f,-1.0f, 1.0f);   //V2(blue)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+    //Triangle 3
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f( 1.0f,-1.0f,-1.0f);   //V3(green)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+    //Triangle 4
+    glColor3f(1.0f,0.0f,0.0f); glVertex3f( 0.0f, 1.0f, 0.0f);   //V0(red)
+    glColor3f(0.0f,0.0f,1.0f); glVertex3f(-1.0f,-1.0f,-1.0f);   //V4(blue)
+    glColor3f(0.0f,1.0f,0.0f); glVertex3f(-1.0f,-1.0f, 1.0f);   //V1(green)
+    glEnd();
+
     glPopMatrix();
     glDisable(GL_TEXTURE_2D);
   }
