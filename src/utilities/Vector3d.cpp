@@ -181,13 +181,13 @@ Vector3d				Vector3d::normal()
 {
   double length;
   if (this->length() == 0)
-    length = 0;
+    length = 0.0f;
   else
-    length = 1 / this->length();
-  double nx = this->x * length;
-  double ny = this->y * length;
-  double nz = this->z * length;
-  return Vector3d(nx, ny, nz);
+    length = 1.0f / this->length();
+  this->x *= length;
+  this->y *= length;
+  this->z *= length;
+  return *this;
 }
 
 double					Vector3d::angle(const Vector3d& other)
