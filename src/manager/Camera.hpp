@@ -37,6 +37,8 @@ public:
     if (!d)
       return false;
     this->center_ = Vector3d(al_get_display_width(d) / 2.0f, al_get_display_height(d) / 2.0f, 0.0f);
+    al_set_mouse_xy(d, this->center_.x, this->center_.y);
+    al_grab_mouse(d);
 
     al_get_mouse_state(&state);
     this->focus_ = Vector3d(state.y, state.x, 0.0f);
@@ -54,26 +56,23 @@ public:
 
     gluLookAt(this->position_.x, this->position_.y, this->position_.z,
 	      this->target_.x, this->target_.y, this->target_.z,
-	      0, 1, 0);
+	      0, 0, 1);
 
     ALLEGRO_MOUSE_STATE			state;
     Vector3d				pos;
 
-    // glPushMatrix();
-    // glLoadIdentity();
     al_get_mouse_state(&state);
     pos = Vector3d(state.x, state.y, 0.0f);
-    // glPopMatrix();
+    this->focus_ -= pos;
 
-    pos -= this->center_;
-    pos /= this->center_;
-    this->theta_ -= (float)pos.x * this->sensitivity_;
-    this->phi_ -= (float)pos.y * this->sensitivity_;
+    this->theta_ -= (float)this->focus_.x * this->sensitivity_;
+    this->phi_ -= (float)this->focus_.y * this->sensitivity_;
 
-    std::cout << state.x <<  " " << state.y <<std::endl;
+    this->focus_ = pos;
+    // std::cout << state.x <<  " " << state.y <<std::endl;
 
-    // std::cout << this->theta_<<  " " << this->phi_ <<std::endl;
     updateVectors();
+    std::cout << this->theta_<<  " " << this->phi_ <<std::endl;
 
   }
 
@@ -101,7 +100,7 @@ public:
       {
 	this->position_ -= this->forward_ * Vector3d(speed, speed, speed);
       }
-    if (al_key_down(&k, ALLEGRO_KEY_A))
+    else if (al_key_down(&k, ALLEGRO_KEY_A))
       {
 	this->position_ += this->left_ * Vector3d(speed, speed, speed);
       }
@@ -138,15 +137,14 @@ private:
 
     double				r;
 
-    r = cos(this->phi_ * M_PI / 180);
-    this->forward_.z = sin(this->phi_ * M_PI / 180);
-    this->forward_.x = r * cos(this->theta_ * M_PI / 180);
-    this->forward_.y = r * sin(this->theta_ * M_PI / 180);
+    r = cos(this->phi_ * M_PI / 180.0f);
+    this->forward_.z = sin(this->phi_ * M_PI / 180.0f);
+    this->forward_.x = r * cos(this->theta_ * M_PI / 180.0f);
+    this->forward_.y = r * sin(this->theta_ * M_PI / 180.0f);
 
     this->left_ = up.crossProduct(this->forward_);
     this->left_.normal();
     this->target_ = this->position_ + this->forward_;
-    // std::cout << this->target_.x << " " << this->target_.y << " " << this->target_.x << std::endl;
   }
 private:
   Vector3d				target_;
