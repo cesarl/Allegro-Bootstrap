@@ -19,7 +19,7 @@ public:
     theta_(0.0f),
     phi_(0.0f),
     sensitivity_(1.0f),
-    speed_(10.0f)
+    speed_(30.0f)
   {
     this->updateVectors();
   }
@@ -41,11 +41,14 @@ public:
     al_grab_mouse(d);
 
     al_get_mouse_state(&state);
-    this->focus_ = Vector3d(state.y, state.x, 0.0f);
+    this->focus_ = this->center_;
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60.0, (double)((this->center_.getX() * 2.0f) / (this->center_.getY() * 2.0f)), 1.0, 1000.0);
+    this->theta_ = 0.0f;
+    this->phi_ = 0.0f;
+    updateVectors();
     return true;
   }
 
@@ -54,9 +57,13 @@ public:
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt(this->position_.x, this->position_.y, this->position_.z,
-	      this->target_.x, this->target_.y, this->target_.z,
-	      0, 0, 1);
+    // gluLookAt(this->position_.x, this->position_.y, this->position_.z,
+    // 	      this->target_.x, this->target_.y, this->target_.z,
+    // 	      0, 1, 1);
+
+    glRotatef(this->phi_, 1.0f, 0.0f, 0.0f);
+    glRotatef(this->theta_, 0.0f, 1.0f, 0.0f);
+    glTranslatef(-this->position_.x, -this->position_.y, -this->position_.z);
 
     ALLEGRO_MOUSE_STATE			state;
     Vector3d				pos;
@@ -96,15 +103,15 @@ public:
       {
 	this->position_ += this->forward_ * Vector3d(speed, speed, speed);
       }
-    else if (al_key_down(&k, ALLEGRO_KEY_S))
+    if (al_key_down(&k, ALLEGRO_KEY_S))
       {
 	this->position_ -= this->forward_ * Vector3d(speed, speed, speed);
       }
-    else if (al_key_down(&k, ALLEGRO_KEY_A))
+    if (al_key_down(&k, ALLEGRO_KEY_A))
       {
 	this->position_ += this->left_ * Vector3d(speed, speed, speed);
       }
-    else if (al_key_down(&k, ALLEGRO_KEY_D))
+    if (al_key_down(&k, ALLEGRO_KEY_D))
       {
 	this->position_ -= this->left_ * Vector3d(speed, speed, speed);
       }
@@ -124,8 +131,6 @@ public:
 private:
   void					updateVectors()
   {
-    static	Vector3d		up(0.0f, 1.0f, 1.0f);
-
     if (this->phi_ > 89.0)
       {
 	this->phi_ = 89.0;
@@ -135,16 +140,26 @@ private:
 	this->phi_ = -89.0;
       }
 
+    if (this->theta_ > 360.0)
+      {
+	this->theta_ = 0.0;
+      }
+    else if (this->theta_ < 0.0)
+      {
+	this->theta_ = 360.0;
+      }
+
     double				r;
 
     r = cos(this->phi_ * M_PI / 180.0f);
-    this->forward_.z = sin(this->phi_ * M_PI / 180.0f);
-    this->forward_.x = r * cos(this->theta_ * M_PI / 180.0f);
-    this->forward_.y = r * sin(this->theta_ * M_PI / 180.0f);
+    this->forward_.x = r * sin(this->theta_ * M_PI / 180.0f);
+    this->forward_.y = sin(this->phi_ * M_PI / 180.0f * -1.0f);
+    this->forward_.z = r * cos(this->theta_ * M_PI / 180.0f) * -1.0f * cos(this->phi_ * M_PI / 180.0f);
 
-    this->left_ = up.crossProduct(this->forward_);
-    this->left_.normal();
-    this->target_ = this->position_ + this->forward_;
+    // this->left_ = Vector3d(cos(this->phi_ * M_PI / 180.0f), sin(this->phi_ * M_PI / 180.0f), 0.0f);
+    // this->left_ = this->left_.normal();
+    // this->target_ = this->position_ + this->forward_;
+    this->left_ = Vector3d(0.0f, 0.0f, 0.0f);
   }
 private:
   Vector3d				target_;
