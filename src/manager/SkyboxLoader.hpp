@@ -3,6 +3,7 @@
 
 #include				<allegro5/allegro.h>
 #include				<allegro5/allegro_opengl.h>
+#include				<map>
 #include				"Loader.hpp"
 #include				"Image.hpp"
 #include				"Skybox.hpp"
@@ -19,7 +20,20 @@ public:
     // A terminer
     // http://raptor.developpez.com/tutorial/opengl/skybox/
 
-    ALLEGRO_FS_ENTRY *fs;
+    ALLEGRO_FS_ENTRY			*fs;
+    ALLEGRO_FS_ENTRY			*content;
+    ALLEGRO_BITMAP			*bmps[6];
+    int					fileCnt = 0;
+    GLuint				cube_map_texture_ID;
+    GLenum				cube_map_target[6] = {
+      GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+      GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+      GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+      GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+      GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+      GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+    };
+    std::map<std::string, ALLEGRO_LOCKED_REGION*> texture_image;
 
     fs = al_create_fs_entry(file.getFullName().c_str());
     if (!fs)
@@ -30,56 +44,60 @@ public:
       {
 	throw LoadingFailed(file.getFullName(), "SkyboxLoader failed to open skybox folder.");
       }
+    if (!al_fs_entry_exists(fs))
+      {
+	throw LoadingFailed(file.getFullName(), "SkyboxLoader can't find folder.");
+      }
 
+    al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP);
 
+    while ((content = al_read_directory(fs)))
+      {
+	const char *name = al_get_fs_entry_name(content);
+	ALLEGRO_LOCKED_REGION *r;
+	std::cout << name << std::endl;
+	bmps[fileCnt] = al_load_bitmap(name);
+	if (!bmps[fileCnt])
+	  throw LoadingFailed(name, "SkyboxLoader can't load image.");
+	r = al_lock_bitmap(bmps[fileCnt], ALLEGRO_PIXEL_FORMAT_ANY, ALLEGRO_LOCK_READWRITE);
+	if (!r)
+	  throw LoadingFailed(name, "SkyboxLoader can't lock bitmap.");
+	texture_image.insert(std::pair<std::string, ALLEGRO_LOCKED_REGION*>(std::string(name), r));
+	++fileCnt;
+      }
 
-//     // Chargement des six textures
-//     AUX_RGBImageRec * texture_image[6];
-//     texture_image[0] = LoadBMP( "Skybox/XN.bmp" );
-//     texture_image[1] = LoadBMP( "Skybox/XP.bmp" );
-//     texture_image[2] = LoadBMP( "Skybox/YN.bmp" );
-//     texture_image[3] = LoadBMP( "Skybox/YP.bmp" );
-//     texture_image[4] = LoadBMP( "Skybox/ZN.bmp" );
-//     texture_image[5] = LoadBMP( "Skybox/ZP.bmp" );
+    al_set_new_bitmap_flags(~ALLEGRO_MEMORY_BITMAP);
 
-//     // Génération d'une texture CubeMap
-//     GLuint cube_map_texture_ID;
-//     glGenTextures(1, &cube_map_texture_ID);
+    // Génération d'une texture CubeMap
+    glGenTextures(1, &cube_map_texture_ID);
 
-//     // Configuration de la texture
-//     glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, cube_map_texture_ID);
+    if (cube_map_texture_ID == 0)
+      throw LoadingFailed(file.getFullName(), "SkyboxLoader error generating a texture.");
 
-//     for (int i = 0; i < 6; i++)
-//       {
-// 	glTexImage2D(cube_map_target[i], 0, 3, texture_image[i]->sizeX, texture_image[i]->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_image[i]->data);
+    // Configuration de la texture
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cube_map_texture_ID);
 
-// 	if (texture_image[i])
-// 	  {
-// 	    if (texture_image[i]->data)
-// 	      {
-// 		free(texture_image[i]->data);
-// 	      }
-// 	    free(texture_image[i]);
-// 	  }
-//       }
+    std::map<std::string, ALLEGRO_LOCKED_REGION*>::iterator it = texture_image.begin();
+    int i = 0;
+    while (it != texture_image.end())
+      {
+	glTexImage2D(cube_map_target[i], 0, it->second->pixel_size,
+		     al_get_bitmap_width(bmps[i]),
+		     al_get_bitmap_height(bmps[i]),
+		     0, GL_BGRA, GL_UNSIGNED_BYTE,
+		     it->second->data);
+	// al_unlock_bitmap(bmps[i]);
+	// al_destroy_bitmap(bmps[i]);
+	++i;
+	++it;
+      }
 
-//     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//     glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP);
-// glTexParameteri(GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-
-
-    ALLEGRO_BITMAP			*bmp;
-    GLuint				tex;
-
-    bmp = al_load_bitmap(file.getFullName().c_str());
-    if (!bmp)
-      throw LoadingFailed(file.getFullName(), "SkyboxLoader failed to load image.");
-    tex = al_get_opengl_texture(bmp);
-    if (tex == 0)
-      throw LoadingFailed(file.getFullName(), "SkyboxLoader failed to load texture.");
-    return new Skybox(bmp, tex, file.getFileName(), force);
+    return new Skybox(cube_map_texture_ID, file.getFileName(), force);
   }
 
   virtual void				save(const Skybox *, const std::string &name)

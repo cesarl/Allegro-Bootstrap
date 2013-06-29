@@ -84,6 +84,7 @@ public:
   {
     if (this->bmp_)
       al_destroy_bitmap(this->bmp_);
+    glDeleteTextures(1, &tex_);
   };
 private:
   ALLEGRO_BITMAP			*bmp_;
