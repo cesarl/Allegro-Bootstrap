@@ -12,100 +12,100 @@
 class					Skybox : public Resource
 {
 public:
-  Skybox(ALLEGRO_BITMAP *bmp, GLuint tex, std::string const & name, bool force) :
+  Skybox(GLuint tex, std::string const & name, bool force) :
     Resource(name, force),
-    bmp_(bmp),
     tex_(tex)
   {};
 
   virtual void				operator=(Skybox & o)
   {
-    if (this->bmp_)
-      al_destroy_bitmap(this->bmp_);
-    this->bmp_ = o.bmp_;
     this->tex_ = o.tex_;
   }
 
-  void					draw(const Vector3d & position, const Vector3d & size) const
+  void					draw(const Vector3d & rotation, const Vector3d & size) const
   {
+
+    glEnable(GL_TEXTURE_CUBE_MAP);
+    glDepthMask(GL_FALSE);
+
+    // Taille du cube
+    float t = 100.0f;
+
+    // Utilisation de la texture CubeMap
+    glBindTexture(GL_TEXTURE_CUBE_MAP, this->tex_);
+
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    // Réglage de l'orientation
     glPushMatrix();
+    glLoadIdentity();
+    glRotatef(rotation.x, 1.0f, 0.0f, 0.0f );
+    glRotatef(rotation.y, 0.0f, 1.0f, 0.0f );
+    glRotatef(rotation.z, 0.0f, 0.0f, 1.0f );
 
-    glTranslatef(position.x,position.y,position.z);
+    //    glTranslatef(position.x,position.y,position.z);
 
-    glScalef(size.x,size.y,size.z);
-
-    float r = 1.0f; // If you have border issues change this to 1.005f
-
-    glEnable(GL_TEXTURE_2D);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    glColor4f(1.0, 1.0, 1.0, 1.0f);
-
-    glBindTexture(GL_TEXTURE_2D, this->tex_);
-
-    // Common Axis Z - FRONT Side
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.25f, 0.3333333f); glVertex3f(-r, 1.0f, -r);
-    glTexCoord2f(0.25f, 0.6666666f); glVertex3f(-r, 1.0f, r);
-    glTexCoord2f(0.0f, 0.6666666f); glVertex3f( r,1.0f, r);
-    glTexCoord2f(0.0f, 0.3333333f); glVertex3f( r,1.0f,-r);
+    // Rendu de la géométrie
+    glBegin(GL_TRIANGLE_STRIP);// X Négatif
+    glTexCoord3f(-t,-t,-t); glVertex3f(-t,-t,-t);
+    glTexCoord3f(-t,t,-t); glVertex3f(-t,t,-t);
+    glTexCoord3f(-t,-t,t); glVertex3f(-t,-t,t);
+    glTexCoord3f(-t,t,t); glVertex3f(-t,t,t);
     glEnd();
 
-    // Common Axis Z - BACK side
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.75f, 0.3333333f);  glVertex3f(-r,-1.0f,-r);
-    glTexCoord2f(0.75f, 0.6666666f);  glVertex3f(-r,-1.0f, r);
-    glTexCoord2f(0.50f, 0.6666666f);  glVertex3f( r,-1.0f, r);
-    glTexCoord2f(0.50f, 0.3333333f);  glVertex3f( r,-1.0f,-r);
+    glBegin(GL_TRIANGLE_STRIP);// X Positif
+    glTexCoord3f(t, -t,-t); glVertex3f(t,-t,-t);
+    glTexCoord3f(t,-t,t); glVertex3f(t,-t,t);
+    glTexCoord3f(t,t,-t); glVertex3f(t,t,-t);
+    glTexCoord3f(t,t,t); glVertex3f(t,t,t);
     glEnd();
 
-    // Common Axis X - Left side
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.5f, 0.6666666f); glVertex3f(-1.0f, -r, r);
-    glTexCoord2f(0.25f, 0.6666666f); glVertex3f(-1.0f,  r, r);
-    glTexCoord2f(0.25f, 0.3333333f); glVertex3f(-1.0f,  r,-r);
-    glTexCoord2f(0.5f, 0.3333333f); glVertex3f(-1.0f, -r,-r);
+    glBegin(GL_TRIANGLE_STRIP);// Y Négatif
+    glTexCoord3f(-t,-t,-t); glVertex3f(-t,-t,-t);
+    glTexCoord3f(-t,-t,t); glVertex3f(-t,-t,t);
+    glTexCoord3f(t, -t,-t); glVertex3f(t,-t,-t);
+    glTexCoord3f(t,-t,t); glVertex3f(t,-t,t);
     glEnd();
 
-    // Common Axis X - Right side
-    glBegin(GL_QUADS);
-    glTexCoord2f(1.0f, 0.6666666f); glVertex3f(1.0f, -r, r);
-    glTexCoord2f(0.75f, 0.6666666f); glVertex3f(1.0f,  r, r);
-    glTexCoord2f(0.75f, 0.3333333f); glVertex3f(1.0f,  r,-r);
-    glTexCoord2f(1.0f, 0.3333333f); glVertex3f(1.0f, -r,-r);
+    glBegin(GL_TRIANGLE_STRIP);// Y Positif
+    glTexCoord3f(-t,t,-t); glVertex3f(-t,t,-t);
+    glTexCoord3f(t,t,-t); glVertex3f(t,t,-t);
+    glTexCoord3f(-t,t,t); glVertex3f(-t,t,t);
+    glTexCoord3f(t,t,t); glVertex3f(t,t,t);
     glEnd();
 
-    // Common Axis Y - Draw Up side
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.25f, 0.0f); glVertex3f( r, -r, 1.0f);
-    glTexCoord2f(0.50f, 0.0f); glVertex3f( r,  r, 1.0f);
-    glTexCoord2f(0.50f, 0.3333333f); glVertex3f(-r,  r, 1.0f);
-    glTexCoord2f(0.25f, 0.3333333f); glVertex3f(-r, -r, 1.0f);
+    glBegin(GL_TRIANGLE_STRIP);// Z Négatif
+    glTexCoord3f(-t,-t,-t); glVertex3f(-t,-t,-t);
+    glTexCoord3f(t, -t,-t); glVertex3f(t,-t,-t);
+    glTexCoord3f(-t,t,-t); glVertex3f(-t,t,-t);
+    glTexCoord3f(t,t,-t); glVertex3f(t,t,-t);
     glEnd();
 
-    // Common Axis Y - Down side
-    glBegin(GL_QUADS);
-    glTexCoord2f(0.25f, 0.6666666f); glVertex3f( r, -r, -1.0f);
-    glTexCoord2f(0.50f, 0.6666666f); glVertex3f( r,  r, -1.0f);
-    glTexCoord2f(0.50f, 1.0f); glVertex3f(-r,  r, -1.0f);
-    glTexCoord2f(0.25f, 1.0f); glVertex3f(-r, -r, -1.0f);
+    glBegin(GL_TRIANGLE_STRIP);// Z Positif
+    glTexCoord3f(-t,-t,t); glVertex3f(-t,-t,t);
+    glTexCoord3f(-t,t,t); glVertex3f(-t,t,t);
+    glTexCoord3f(t,-t,t); glVertex3f(t,-t,t);
+    glTexCoord3f(t,t,t); glVertex3f(t,t,t);
     glEnd();
 
-    // Load Saved Matrix
+    // Réinitialisation de la matrice ModelView
     glPopMatrix();
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    glDepthMask(GL_TRUE);
+    glDisable(GL_TEXTURE_CUBE_MAP);
+    // glEnable(GL_LIGHTING);
+
+    (void)rotation;
+    (void)size;
+
   }
 
   virtual ~Skybox()
   {
-    if (this->bmp_)
-      al_destroy_bitmap(this->bmp_);
+    glDeleteTextures(1, &tex_);
   };
 private:
-  ALLEGRO_BITMAP			*bmp_;
   GLuint				tex_;
 };
 

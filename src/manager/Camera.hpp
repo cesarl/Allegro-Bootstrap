@@ -60,6 +60,7 @@ public:
     glRotatef(this->phi_, 1.0f, 0.0f, 0.0f);
     glRotatef(this->theta_, 0.0f, 1.0f, 0.0f);
     glTranslatef(-this->position_.x, -this->position_.y, -this->position_.z);
+    this->rotation_ = Vector3d(this->phi_, this->theta_, 0.0f);
   }
 
   inline void				inputBehavior(float time, const ALLEGRO_EVENT &ev)
@@ -91,6 +92,12 @@ public:
   {
     return this->position_;
   }
+
+  inline const Vector3d			&getRotation() const throw()
+  {
+    return this->rotation_;
+  }
+
 
 private:
   void					updateVectors()
@@ -128,6 +135,7 @@ private:
   double				phi_;
   float					sensitivity_;
   float					speed_;
+  Vector3d				rotation_;
 };
 
 template				<class CameraBehavior>
