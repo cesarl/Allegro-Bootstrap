@@ -1,6 +1,7 @@
 #include				<iostream>
 #include				"Logger.hpp"
 #include				"ImageLoader.hpp"
+#include				"SkyboxLoader.hpp"
 #include				"MediaManager.hpp"
 #include				"ResourceManager.hpp"
 #include				"MainManager.hpp"
@@ -10,14 +11,16 @@
 
 static ImagePtr img2;
 
-static Camera camera;
+static Camera<FreeFlight> camera;
 
 void					draw(float time, const ALLEGRO_EVENT &ev)
 {
   ImagePtr img = ResourceManager::getInstance().get<Image>("stars.png");
+  // SkyboxPtr sky = ResourceManager::getInstance().get<Skybox>("skybox.jpg");
 
   camera.update(time, ev);
   img2->draw3d();
+  // sky->draw(camera.getPosition(), Vector3d(1000, 1000, 1000));
   // img->draw();
   (void)ev;
   (void)time;
@@ -52,6 +55,7 @@ int					main()
   try
     {
       MediaManager::getInstance().registerLoader(new ImageLoader, ".jpg,.png,.jpeg");
+      MediaManager::getInstance().registerLoader(new SkyboxLoader, ".skybox");
 
       MediaManager::getInstance().addSearchPath("./assets/imgs/");
 
