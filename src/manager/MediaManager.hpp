@@ -14,9 +14,10 @@
 #include				"File.hpp"
 #include				"Singleton.hpp"
 #include				"Image.hpp"
+#include				"Skybox.hpp"
 
 // todo definir la liste des medias pris en charge
-typedef					TYPELIST_1(Image) MediaList;
+typedef					TYPELIST_2(Image, Skybox) MediaList;
 
 template				<class T>
 struct					MediaHolder
