@@ -68,7 +68,6 @@ public:
       }
 
     al_destroy_fs_entry(fs);
-
     al_set_new_bitmap_flags(~ALLEGRO_MEMORY_BITMAP);
 
     // Génération d'une texture CubeMap

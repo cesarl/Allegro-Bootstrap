@@ -98,7 +98,6 @@ public:
     // glEnable(GL_LIGHTING);
 
     (void)rotation;
-
   }
 
   virtual ~Skybox()

@@ -11,7 +11,7 @@
 
 static ImagePtr img2;
 
-static Camera<Orthographic, FreeFlight> camera;
+static Camera<Perspective, FreeFlight> camera;
 
 void					draw(float time, const ALLEGRO_EVENT &ev)
 {
