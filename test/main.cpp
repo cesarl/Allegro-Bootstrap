@@ -11,14 +11,14 @@
 
 static ImagePtr img2;
 
-static Camera<FreeFlight> camera;
+static Camera<Orthographic, FreeFlight> camera;
 
 void					draw(float time, const ALLEGRO_EVENT &ev)
 {
-  static SkyboxPtr sky = ResourceManager::getInstance().get<Skybox>("sky.skybox");
+  static SkyboxPtr sky = ResourceManager::getInstance().get<Skybox>("lake.skybox");
 
   camera.update(time, ev);
-  sky->draw(camera.getRotation(), Vector3d(1000, 1000, 1000));
+  sky->draw(camera.getRotation());
   img2->draw3d();
 
   (void)ev;

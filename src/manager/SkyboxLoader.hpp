@@ -22,7 +22,7 @@ public:
 
     ALLEGRO_FS_ENTRY			*fs;
     ALLEGRO_FS_ENTRY			*content;
-    ALLEGRO_BITMAP			*bmps[6];
+    ALLEGRO_BITMAP			**bmps = new ALLEGRO_BITMAP*[6];
     int					fileCnt = 0;
     GLuint				cube_map_texture_ID;
     GLenum				cube_map_target[6] = {
@@ -63,8 +63,11 @@ public:
 	if (!r)
 	  throw LoadingFailed(name, "SkyboxLoader can't lock bitmap.");
 	texture_image.insert(std::pair<std::string, ALLEGRO_LOCKED_REGION*>(std::string(name), r));
+	al_destroy_fs_entry(content);
 	++fileCnt;
       }
+
+    al_destroy_fs_entry(fs);
 
     al_set_new_bitmap_flags(~ALLEGRO_MEMORY_BITMAP);
 
@@ -86,8 +89,7 @@ public:
 		     al_get_bitmap_height(bmps[i]),
 		     0, GL_BGRA, GL_UNSIGNED_BYTE,
 		     it->second->data);
-	// al_unlock_bitmap(bmps[i]);
-	// al_destroy_bitmap(bmps[i]);
+	al_unlock_bitmap(bmps[i]);
 	++i;
 	++it;
       }
@@ -97,7 +99,7 @@ public:
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-    return new Skybox(cube_map_texture_ID, file.getFileName(), force);
+    return new Skybox(cube_map_texture_ID, bmps, file.getFileName(), force);
   }
 
   virtual void				save(const Skybox *, const std::string &name)

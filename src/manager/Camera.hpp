@@ -19,6 +19,9 @@ public:
     speed_(30.0f)
   {}
 
+  virtual ~FreeFlight()
+  {}
+
   inline bool				initBehavior() throw()
   {
     ALLEGRO_DISPLAY			*d;
@@ -29,8 +32,8 @@ public:
     if (!d)
       return false;
     center = Vector3d(al_get_display_width(d) / 2.0f, al_get_display_height(d) / 2.0f, 0.0f);
-    al_set_mouse_xy(d, center.x, center.y);
-    al_grab_mouse(d);
+    // al_set_mouse_xy(d, center.x, center.y);
+    // al_grab_mouse(d);
 
     this->focus_ = center;
 
@@ -81,6 +84,26 @@ public:
     if (al_key_down(&k, ALLEGRO_KEY_S))
       {
 	this->position_ -= this->forward_ * Vector3d(speed, speed, speed);
+      }
+    if (al_key_down(&k, ALLEGRO_KEY_A))
+      {
+	Vector3d up(0.0f, 1.0f, 0.0f);
+	Vector3d left = up.crossProduct(this->forward_);
+	this->position_ += left.normal();
+      }
+    if (al_key_down(&k, ALLEGRO_KEY_D))
+      {
+	Vector3d up(0.0f, 1.0f, 0.0f);
+	Vector3d left = up.crossProduct(this->forward_);
+	this->position_ -= left.normal();
+      }
+    if (al_key_down(&k, ALLEGRO_KEY_Q))
+      {
+	this->position_ += Vector3d(0.0f, this->speed_ / 20.0f, 0.0f);
+      }
+    if (al_key_down(&k, ALLEGRO_KEY_E))
+      {
+	this->position_ -= Vector3d(0.0f, this->speed_ / 20.0f, 0.0f);
       }
 
     lastTime = time;
@@ -138,19 +161,17 @@ private:
   Vector3d				rotation_;
 };
 
-template				<class CameraBehavior>
-class					Camera : public CameraBehavior
+class					Perspective
 {
 public:
-  Camera() :
+  explicit Perspective() throw() :
     center_(Vector3d(0.0f, 0.0f, 0.0f))
-  {
-  }
-
-  ~Camera()
   {}
 
-  bool					init()
+  virtual ~Perspective()
+  {}
+
+  inline bool				initRender() throw()
   {
     ALLEGRO_DISPLAY			*d;
     Vector3d				pos;
@@ -163,14 +184,92 @@ public:
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60.0, (double)((this->center_.getX() * 2.0f) / (this->center_.getY() * 2.0f)), 1.0, 1000.0);
+    return true;
+  }
+
+  inline void				updateRender(float, const ALLEGRO_EVENT &) throw()
+  {
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+  }
+
+  inline void				inputRender(float, const ALLEGRO_EVENT &) throw()
+  {}
+
+private:
+  Vector3d				center_;
+};
+
+class					Orthographic
+{
+public:
+  explicit Orthographic() throw() :
+    min_(Vector3d(0.0f, 0.0f, 0.0f)),
+    max_(Vector3d(0.0f, 0.0f, 0.0f)),
+    size_(Vector3d(0.0f, 0.0f, 0.0f)),
+    center_(Vector3d(0.0f, 0.0f, 0.0f))
+  {}
+
+  virtual ~Orthographic()
+  {}
+
+  inline bool				initRender() throw()
+  {
+    ALLEGRO_DISPLAY			*d;
+    Vector3d				pos;
+
+    d = al_get_current_display();
+    if (!d)
+      return false;
+    this->size_ = Vector3d(al_get_display_width(d), al_get_display_height(d), 0.0f);
+    this->center_ = Vector3d(this->size_.x / 2.0f, this->size_.y / 2.0f, 0.0f);
+    this->max_ = this->min_;
+    this->max_ += this->size_;
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(this->min_.x, this->max_.x, this->min_.y, this->max_.y, 1.0, 1000.0);
+    return true;
+  }
+
+  inline void				updateRender(float, const ALLEGRO_EVENT &) throw()
+  {
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+  }
+
+  inline void				inputRender(float, const ALLEGRO_EVENT &) throw()
+  {}
+
+private:
+  Vector3d				min_;
+  Vector3d				max_;
+  Vector3d				size_;
+  Vector3d				center_;
+};
+
+
+template				<class CameraRender, class CameraBehavior>
+class					Camera : public CameraRender, public CameraBehavior
+{
+public:
+  Camera()
+  {
+  }
+
+  virtual ~Camera()
+  {}
+
+  bool					init()
+  {
+    if (!this->initRender())
+      return false;
     return this->initBehavior();
   }
 
   void					update(float time, const ALLEGRO_EVENT &ev)
   {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
+    this->updateRender(time, ev);
     this->updateBehavior(time, ev);
   }
 
@@ -180,12 +279,11 @@ public:
 
   void					input(float time, const ALLEGRO_EVENT &ev)
   {
+    this->inputRender(time, ev);
     this->inputBehavior(time, ev);
     (void)ev;
     (void)time;
   }
-private:
-  Vector3d				center_;
 };
 
 #endif					// __CAMMERA_HPP__

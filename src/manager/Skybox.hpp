@@ -12,9 +12,10 @@
 class					Skybox : public Resource
 {
 public:
-  Skybox(GLuint tex, std::string const & name, bool force) :
+  Skybox(GLuint tex, ALLEGRO_BITMAP **bmp, std::string const & name, bool force) :
     Resource(name, force),
-    tex_(tex)
+    tex_(tex),
+    bmp_(bmp)
   {};
 
   virtual void				operator=(Skybox & o)
@@ -22,7 +23,7 @@ public:
     this->tex_ = o.tex_;
   }
 
-  void					draw(const Vector3d & rotation, const Vector3d & size) const
+  void					draw(const Vector3d & rotation) const
   {
 
     glEnable(GL_TEXTURE_CUBE_MAP);
@@ -97,16 +98,22 @@ public:
     // glEnable(GL_LIGHTING);
 
     (void)rotation;
-    (void)size;
 
   }
 
   virtual ~Skybox()
   {
+    for (int i = 0; i < 6; ++i)
+      {
+	if (this->bmp_[i])
+	  al_destroy_bitmap(this->bmp_[i]);
+      }
+    delete [] this->bmp_;
     glDeleteTextures(1, &tex_);
   };
 private:
   GLuint				tex_;
+  ALLEGRO_BITMAP			**bmp_;
 };
 
 typedef					SmartPtr<Skybox, InternalRef> SkyboxPtr;
